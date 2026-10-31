@@ -1,0 +1,1330 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dear, Unspoken ♡</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --pink:#f3dce9;--pink2:#e9bfd6;--lav:#e7e0f4;
+  --lav2:#cbbce4;--rose:#bd829f;--purple:#8877a9;
+  --cream:#fffaf9;--ink:#64536b;--muted:#a797aa;
+  --white:#fff;--line:#f0e5ee;
+  --shadow:0 12px 35px rgba(132,100,145,.09);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;color:var(--ink);
+  background:
+    radial-gradient(circle at 90% 5%,rgba(229,211,245,.4),transparent 25%),
+    radial-gradient(circle at 5% 90%,rgba(248,220,234,.35),transparent 25%),
+    var(--cream);
+  font-family:"DM Sans",sans-serif;
+}
+button,input,textarea{font:inherit}
+button{cursor:pointer}
+button:disabled{opacity:.5;cursor:not-allowed}
+.hidden{display:none!important}
+
+#authScreen{
+  min-height:100vh;display:grid;place-items:center;padding:25px;
+  background:
+    radial-gradient(circle at 15% 15%,#f5e2f0,transparent 35%),
+    radial-gradient(circle at 85% 80%,#e7e0f7,transparent 35%),
+    #fffaf9;
+}
+.auth-card{
+  width:min(440px,100%);background:rgba(255,255,255,.9);
+  border:1px solid white;border-radius:28px;padding:35px;
+  box-shadow:0 20px 70px rgba(125,90,145,.13);text-align:center;
+}
+.auth-decoration{color:#c4a5cf;letter-spacing:12px;margin-bottom:20px}
+.brand{font:italic 36px "Playfair Display",serif;color:var(--rose)}
+.brand-sub{letter-spacing:4px;font-size:10px;color:var(--muted);margin:10px 0 25px}
+.auth-card h2{font:25px "Playfair Display",serif;font-weight:400}
+.auth-card p{color:var(--muted);line-height:1.7;font-size:13px}
+.auth-btn{
+  width:100%;border:1px solid var(--line);background:white;color:var(--ink);
+  padding:14px;border-radius:14px;margin-top:15px;transition:.2s;
+}
+.auth-btn:hover{background:#fff5fa;transform:translateY(-2px)}
+.auth-foot{font-size:11px!important;margin-top:25px}
+
+#app{display:none;min-height:100vh}
+.sidebar{
+  position:fixed;inset:0 auto 0 0;width:245px;
+  background:rgba(255,255,255,.83);border-right:1px solid var(--line);
+  padding:28px 18px;z-index:5;overflow:auto;backdrop-filter:blur(15px);
+}
+.logo{font:italic 25px "Playfair Display",serif;color:var(--rose)}
+.logo-sub{font-size:9px;letter-spacing:3px;color:var(--muted);margin:8px 0 35px}
+.nav-label{font-size:9px;letter-spacing:2px;color:#b5a6b8;margin:25px 10px 9px}
+.nav-btn{
+  width:100%;border:0;border-radius:13px;background:transparent;
+  color:#82718b;padding:12px;text-align:left;margin:3px 0;transition:.2s;
+}
+.nav-btn:hover,.nav-btn.active{background:#f7eaf2;color:#a86f91}
+.sidebar-quote{
+  margin-top:35px;padding:17px;border-radius:16px;
+  background:linear-gradient(145deg,#fbf0f6,#f0ebf8);
+  color:#987f9e;font:italic 13px/1.8 "Playfair Display",serif;
+}
+.main{margin-left:245px;padding:32px;max-width:1450px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;gap:12px}
+.date-text{font-size:11px;color:var(--muted)}
+.greeting{font:20px "Playfair Display",serif;margin-top:5px}
+.user-pill{border-radius:30px;padding:9px 14px;background:#f8edf4;color:#98718d;font-size:12px}
+.page{display:none;animation:fade .3s}
+.page.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+h1{font:400 35px "Playfair Display",serif;margin:0 0 10px}
+h2{font:400 25px "Playfair Display",serif}
+h3{font-size:15px}
+.sub{color:var(--muted);line-height:1.8;font-size:13px;margin:0 0 25px}
+.hero{
+  position:relative;overflow:hidden;border-radius:25px;padding:38px;
+  background:linear-gradient(120deg,#f7e4ef,#eee7f8 65%,#fff0ed);
+  margin-bottom:22px;
+}
+.hero:after{content:"☾";position:absolute;right:45px;top:12px;font-size:110px;color:rgba(255,255,255,.65)}
+.hero h1{font-size:39px;color:#8d6e98}
+.hero p{max-width:470px;color:#987f9b;line-height:1.8;font-size:13px}
+.card{
+  background:rgba(255,255,255,.9);border:1px solid var(--line);
+  border-radius:20px;padding:22px;box-shadow:var(--shadow);margin-bottom:18px;
+}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px}
+.feature{cursor:pointer;transition:.2s}
+.feature:hover{transform:translateY(-4px)}
+.feature .emoji{font-size:29px}
+.feature p{font-size:12px;color:var(--muted);line-height:1.7}
+.btn{
+  border:0;border-radius:12px;padding:11px 17px;
+  background:linear-gradient(120deg,#d59bb8,#a997c9);
+  color:white;font-size:12px;transition:.2s;
+}
+.btn:hover{filter:brightness(.97);transform:translateY(-1px)}
+.btn.soft{background:#f7eaf2;color:#a16e8d}
+.btn.white{background:white;color:#907b99;border:1px solid var(--line)}
+.btn.danger{background:#fff0f1;color:#bd7484}
+.btn.small{padding:8px 11px}
+.field-label{display:block;font-size:11px;color:#9d879e;margin:14px 0 7px}
+input,textarea{
+  width:100%;border:1px solid var(--line);background:#fffdfd;
+  border-radius:12px;padding:13px;outline:none;color:var(--ink);
+}
+input:focus,textarea:focus{border-color:#cba7c9}
+textarea{min-height:120px;resize:vertical;line-height:1.7}
+.muted{color:var(--muted);font-size:11px;line-height:1.7}
+.tag{display:inline-block;padding:5px 10px;background:#f5edf8;border-radius:30px;color:#987da7;font-size:10px}
+.mood-row{display:flex;gap:10px;flex-wrap:wrap;margin:15px 0}
+.mood{background:white;border:1px solid var(--line);border-radius:14px;padding:12px;font-size:22px}
+.mood.selected{background:#f7eaf2;border-color:#d6adc9}
+.entry{border:1px solid var(--line);background:#fffdfd;border-radius:15px;padding:17px;margin:12px 0}
+.entry-body{white-space:pre-wrap;line-height:1.8;font-size:13px;margin:13px 0}
+.entry-meta{font-size:10px;color:var(--muted)}
+.empty{padding:30px;text-align:center;color:var(--muted);font-size:12px;line-height:1.8}
+
+/* LETTER ENVELOPES */
+.letter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:17px}
+.envelope{
+  position:relative;min-height:210px;border:1px solid #ead9e8;
+  border-radius:17px;overflow:hidden;cursor:pointer;
+  background:linear-gradient(145deg,#fff9fc,#f5e8f3);
+  box-shadow:0 8px 22px rgba(145,106,151,.08);
+  padding:22px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;transition:.25s;
+}
+.envelope:nth-child(3n+2){background:linear-gradient(145deg,#fffaf2,#f3e8f3)}
+.envelope:nth-child(3n){background:linear-gradient(145deg,#f8f4ff,#fcecf3)}
+.envelope:hover{transform:translateY(-5px) rotate(-.5deg);box-shadow:var(--shadow)}
+.envelope:before{
+  content:"";position:absolute;inset:0;
+  background:linear-gradient(145deg,transparent 49.5%,rgba(214,187,213,.24) 50%,transparent 50.5%);
+  pointer-events:none;
+}
+.envelope-flower{font-size:25px;margin-bottom:10px}
+.envelope-title{
+  font:italic 19px/1.4 "Playfair Display",serif;color:#8c6e91;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+.envelope-bottom{font-size:9px;letter-spacing:1.5px;color:#b29ab2;margin-top:15px}
+.envelope-seal{
+  width:28px;height:28px;border-radius:50%;background:#e6c1d8;
+  display:grid;place-items:center;color:white;font-size:13px;margin-top:13px;
+}
+.letter-modal-paper{
+  background:#fffaf5;border:1px solid #f0e3dc;border-radius:5px;
+  padding:35px 27px;box-shadow:inset 0 0 30px rgba(194,158,153,.08);
+  position:relative;
+}
+.letter-modal-paper:before{
+  content:"";position:absolute;inset:12px;border:1px solid #f3e9e4;pointer-events:none;
+}
+.paper-top{text-align:center;color:#b58da9;font-size:11px;letter-spacing:3px}
+.paper-title{font:italic 27px/1.4 "Playfair Display",serif;text-align:center;color:#806984;margin:22px 0}
+.paper-body{font:16px/2 "Playfair Display",serif;color:#756476;white-space:pre-wrap;overflow-wrap:anywhere}
+.paper-sign{text-align:right;font:italic 16px "Playfair Display",serif;color:#ad89a7;margin-top:28px}
+.private-reply-card{background:#fbf2f8;border-radius:15px;padding:16px;margin:12px 0}
+.reply-item{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px;margin:10px 0}
+.reply-body{white-space:pre-wrap;font-size:13px;line-height:1.8;margin:8px 0}
+
+.buddy-option{cursor:pointer;border:1px solid var(--line);border-radius:20px;padding:22px;background:white;transition:.2s}
+.buddy-option:hover{background:#fff7fb;border-color:#d5b2d2;transform:translateY(-3px)}
+.buddy-option .big{font-size:37px}
+.buddy-option p{font-size:12px;color:var(--muted);line-height:1.7}
+.consent{background:#fbf2f8;border:1px solid #f0dfeb;border-radius:15px;padding:16px;margin:16px 0}
+.consent label{display:flex;gap:10px;font-size:12px;line-height:1.6;margin:12px 0}
+.consent input{width:auto;accent-color:#bb83a5}
+.chat-box{background:white;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.chat-head{background:linear-gradient(110deg,#f9eaf2,#f0ebf8);padding:16px;display:flex;justify-content:space-between;align-items:center}
+.chat-body{height:340px;overflow:auto;padding:17px;background:#fffdfd}
+.bubble{max-width:82%;width:fit-content;padding:11px 14px;border-radius:15px;background:#f4eff7;font-size:12px;line-height:1.7;margin:9px 0;white-space:pre-wrap}
+.bubble.me{margin-left:auto;background:#f8e6ef}
+.chat-compose{display:flex;gap:9px;padding:12px;border-top:1px solid var(--line)}
+.chat-compose input{flex:1}
+.breath-area{display:grid;place-items:center;padding:35px}
+.breath{
+  width:155px;height:155px;border-radius:50%;
+  background:radial-gradient(circle,#fff,#edcce0 70%);
+  box-shadow:0 0 40px #efd9eb;display:grid;place-items:center;
+  color:#93749b;font:16px "Playfair Display",serif;
+}
+.breath.in{animation:breathIn 4s ease-in-out forwards}
+.breath.hold{transform:scale(1.35)}
+.breath.out{animation:breathOut 6s ease-in-out forwards}
+@keyframes breathIn{to{transform:scale(1.35)}}
+@keyframes breathOut{from{transform:scale(1.35)}to{transform:scale(1)}}
+.ground{padding:13px;border-radius:12px;background:#fbf3f8;margin:8px 0;font-size:12px}
+.modal-bg{
+  display:none;position:fixed;inset:0;z-index:20;background:#48374d77;
+  align-items:center;justify-content:center;padding:18px;
+}
+.modal-bg.show{display:flex}
+.modal{background:white;border-radius:22px;padding:24px;width:min(600px,100%);max-height:90vh;overflow:auto}
+.modal h2{margin-top:0}
+.notice{background:#fff7ec;color:#9a7955;border-radius:12px;padding:12px;font-size:11px;line-height:1.7}
+.modal-actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end;margin-top:18px}
+
+@media(max-width:760px){
+  .sidebar{position:relative;width:100%;inset:auto;padding:14px;border-right:0;border-bottom:1px solid var(--line)}
+  .logo{font-size:21px}
+  .logo-sub,.sidebar-quote,.nav-label{display:none}
+  .sidebar nav{display:flex;overflow:auto;gap:4px}
+  .nav-btn{white-space:nowrap;width:auto;padding:10px;font-size:11px}
+  .main{margin:0;padding:20px 14px}
+  .hero{padding:25px}.hero h1{font-size:31px}
+  .hero:after{right:15px;font-size:75px}
+  h1{font-size:30px}.chat-body{height:300px}
+  .letter-modal-paper{padding:28px 20px}
+  .paper-title{font-size:23px}
+}
+</style>
+</head>
+
+<body>
+
+<!-- EMAIL LOGIN / SIGN UP -->
+<section id="authScreen">
+  <div class="auth-card">
+    <div class="auth-decoration">☾ ✦ ♡ ✧ ✿</div>
+    <div class="brand">Dear, Unspoken ♡</div>
+    <div class="brand-sub">A LITTLE SPACE TO FEEL</div>
+    <h2 id="authTitle">Welcome to your safe space</h2>
+    <p id="authDescription">A place to write, breathe, share and feel understood.</p>
+
+    <div style="text-align:left;margin-top:22px">
+      <label class="field-label">Email address</label>
+      <input type="email" id="authEmail" placeholder="Enter your email" autocomplete="email">
+
+      <label class="field-label">Password</label>
+      <input type="password" id="authPassword" placeholder="Enter your password" autocomplete="current-password">
+    </div>
+
+    <button class="auth-btn" id="authSubmitButton" onclick="handleEmailAuth()">✧ Login</button>
+
+    <p style="font-size:12px;margin-top:20px">
+      <span id="authSwitchText">Don't have an account?</span>
+      <button onclick="toggleAuthMode()" style="border:0;background:none;color:#bd829f;font-weight:700">
+        <span id="authSwitchButton">Sign up</span>
+      </button>
+    </p>
+
+    <p class="auth-foot">Your private diary stays private. Community letters are shared anonymously.</p>
+    <p class="muted" id="authStatus" role="status"></p>
+  </div>
+</section>
+
+<div id="app">
+<aside class="sidebar">
+  <div class="logo">Dear, Unspoken ♡</div>
+  <div class="logo-sub">A SAFE SPACE TO FEEL</div>
+  <nav>
+    <div class="nav-label">YOUR SPACE</div>
+    <button class="nav-btn active" onclick="go('home',this)">⌂ Home</button>
+    <button class="nav-btn" onclick="go('diary',this)">♡ My Diary</button>
+    <button class="nav-btn" onclick="go('community',this)">✉ Community Letters</button>
+    <button class="nav-btn" onclick="go('myletters',this)">💌 My Letters & Replies</button>
+    <div class="nav-label">SUPPORT</div>
+    <button class="nav-btn" onclick="go('buddy',this)">☁ Online Buddy</button>
+    <button class="nav-btn" onclick="go('calm',this)">☾ Calm Down</button>
+    <div class="nav-label">ACCOUNT</div>
+    <button class="nav-btn" onclick="go('history',this)">▤ Chat History</button>
+    <button class="nav-btn" onclick="go('settings',this)">⚙ Settings</button>
+  </nav>
+  <div class="sidebar-quote">
+    "Your feelings deserve a place to land. Even the ones you cannot explain."
+    <br><br>☾ ✦ ♡ ✿
+  </div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <div>
+    <div class="date-text" id="today"></div>
+    <div class="greeting">A little space for you.</div>
+  </div>
+  <div class="user-pill" id="userPill">Unspoken Soul ♡</div>
+</header>
+
+<!-- HOME -->
+<section class="page active" id="home">
+  <div class="hero">
+    <h1>You are allowed to feel everything.</h1>
+    <p>Welcome to your little corner of the world. A place where you can let your thoughts rest, write your feelings and remember that you are never too much.</p>
+    <button class="btn" onclick="go('diary')">Write your feelings ♡</button>
+  </div>
+
+  <div class="grid">
+    <div class="card feature" onclick="go('diary')">
+      <div class="emoji">📖</div>
+      <h3>My Little Diary</h3>
+      <p>A private place for thoughts you are not ready to share.</p>
+    </div>
+    <div class="card feature" onclick="go('community')">
+      <div class="emoji">💌</div>
+      <h3>Letters from Others</h3>
+      <p>Read anonymous letters written by people who may feel like you.</p>
+    </div>
+    <div class="card feature" onclick="go('buddy')">
+      <div class="emoji">☁️</div>
+      <h3>Online Buddy</h3>
+      <p>Find a little comfort when you need someone to listen.</p>
+    </div>
+    <div class="card feature" onclick="go('calm')">
+      <div class="emoji">🌷</div>
+      <h3>Calm Corner</h3>
+      <p>Take a breath. You do not have to figure everything out today.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>A gentle reminder ♡</h2>
+    <p class="sub">You do not have to be productive, happy or strong all the time. Being here is enough for today.</p>
+    <span class="tag">You matter. Always.</span>
+  </div>
+</section>
+
+<!-- DIARY -->
+<section class="page" id="diary">
+  <h1>My Little Diary ♡</h1>
+  <p class="sub">This space belongs only to you. Write freely. Nobody else can read your entries.</p>
+
+  <div class="card">
+    <h2>How are you feeling today?</h2>
+    <div class="mood-row" id="moodRow">
+      <button class="mood selected" data-mood="🌷" onclick="selectMood(this)">🌷</button>
+      <button class="mood" data-mood="😊" onclick="selectMood(this)">😊</button>
+      <button class="mood" data-mood="🥺" onclick="selectMood(this)">🥺</button>
+      <button class="mood" data-mood="😔" onclick="selectMood(this)">😔</button>
+      <button class="mood" data-mood="😡" onclick="selectMood(this)">😡</button>
+      <button class="mood" data-mood="😴" onclick="selectMood(this)">😴</button>
+      <button class="mood" data-mood="🤍" onclick="selectMood(this)">🤍</button>
+    </div>
+    <label class="field-label">Your thoughts</label>
+    <textarea id="diaryBody" placeholder="Dear diary, today I feel..."></textarea>
+    <div style="display:flex;justify-content:flex-end;margin-top:12px">
+      <button class="btn" onclick="saveDiary()">Save to my diary ♡</button>
+    </div>
+    <p class="muted" id="diaryStatus"></p>
+  </div>
+
+  <div class="card">
+    <h2>My entries</h2>
+    <div id="diaryList"><div class="empty">Your diary entries will appear here.</div></div>
+  </div>
+</section>
+
+<!-- COMMUNITY -->
+<section class="page" id="community">
+  <h1>Letters from the Heart 💌</h1>
+  <p class="sub">Every letter carries a feeling. Open one when you feel ready. Your identity stays private to other readers.</p>
+
+  <div class="card">
+    <h2>Leave a little letter</h2>
+    <p class="muted">Share something you have been keeping inside. Your account identity is not displayed to other readers.</p>
+    <label class="field-label">Letter title</label>
+    <input id="letterTitle" maxlength="100" placeholder="A title for your letter...">
+    <label class="field-label">Your letter</label>
+    <textarea id="letterBody" placeholder="Dear someone, ..."></textarea>
+    <div style="display:flex;justify-content:flex-end;margin-top:12px">
+      <button class="btn" onclick="publishLetter()">Seal my letter ✉</button>
+    </div>
+    <p class="muted" id="letterStatus"></p>
+  </div>
+
+  <div class="card">
+    <h2>Letters from our little community</h2>
+    <p class="muted">Click an envelope to open the letter.</p>
+    <div id="letterGrid" class="letter-grid">
+      <div class="empty">Loading letters...</div>
+    </div>
+  </div>
+</section>
+
+<!-- MY LETTERS -->
+<section class="page" id="myletters">
+  <h1>My Letters & Replies 💌</h1>
+  <p class="sub">A little place to see the letters you have written and the private replies you have received or sent.</p>
+  <div class="card">
+    <h2>Letters I wrote</h2>
+    <div id="myLettersList"><div class="empty">Loading your letters...</div></div>
+  </div>
+  <div class="card">
+    <h2>Replies to my letters</h2>
+    <p class="muted">Only you and the person who sent each reply can read it.</p>
+    <div id="receivedReplies"><div class="empty">Loading replies...</div></div>
+  </div>
+  <div class="card">
+    <h2>Replies I sent</h2>
+    <div id="sentReplies"><div class="empty">Loading your replies...</div></div>
+  </div>
+</section>
+
+<!-- BUDDY -->
+<section class="page" id="buddy">
+  <h1>Your Online Buddy ☁</h1>
+  <p class="sub">Sometimes we do not need solutions. Sometimes we just need a space to let things out.</p>
+
+  <div id="buddyChoices" class="grid">
+    <div class="buddy-option" onclick="chooseBuddy('ai')">
+      <div class="big">🌙</div>
+      <h2>AI Buddy</h2>
+      <p>A gentle scripted companion to listen and respond with comforting messages.</p>
+      <button class="btn soft">Talk to AI Buddy</button>
+    </div>
+    <div class="buddy-option" onclick="chooseBuddy('human')">
+      <div class="big">🕊️</div>
+      <h2>Human Buddy</h2>
+      <p>Connect with another person who may understand what you are going through.</p>
+      <button class="btn soft">Human Buddy</button>
+    </div>
+  </div>
+
+  <div id="aiConsent" class="card hidden">
+    <h2>Before we begin ♡</h2>
+    <p class="sub">Would you like this AI Buddy conversation to be saved in your Chat History?</p>
+    <div class="consent">
+      <label><input type="radio" name="saveChat" value="yes" checked> Yes, save my conversation in my account.</label>
+      <label><input type="radio" name="saveChat" value="no"> No, do not save this conversation in my app history.</label>
+    </div>
+    <p class="muted">If you choose not to save, messages will remain only in this open browser session and will not be stored in your chat history table.</p>
+    <button class="btn" onclick="startAIChat()">Continue ♡</button>
+    <button class="btn white" onclick="backBuddy()">Back</button>
+  </div>
+
+  <div id="humanInfo" class="card hidden">
+    <h2>Human Buddy 🕊️</h2>
+    <p class="sub">Human Buddy matching is not connected yet. We are preparing a safe matching system before allowing people to chat with strangers.</p>
+    <div class="notice">Please do not share your phone number, home address, passwords or other personal information with strangers.</div>
+    <button class="btn white" onclick="backBuddy()">Back</button>
+  </div>
+
+  <div id="chatPanel" class="hidden">
+    <div class="chat-box">
+      <div class="chat-head">
+        <div>
+          <strong id="chatTitle">AI Buddy ☁</strong>
+          <div class="muted" id="chatSaveLabel">Your little conversation</div>
+        </div>
+        <button class="btn white small" onclick="endChat()">End chat</button>
+      </div>
+      <div class="chat-body" id="chatBody"></div>
+      <div class="chat-compose">
+        <input id="chatInput" placeholder="Tell me what's on your mind..." onkeydown="if(event.key==='Enter')sendChat()">
+        <button class="btn" onclick="sendChat()">Send</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CALM -->
+<section class="page" id="calm">
+  <h1>Calm Corner ☾</h1>
+  <p class="sub">Take a small pause. You deserve a moment of softness.</p>
+  <div class="card">
+    <h2>Breathing exercise</h2>
+    <p class="muted">Breathe in for 4 seconds, hold for 4 seconds, then breathe out for 6 seconds.</p>
+    <div class="breath-area">
+      <div class="breath" id="breathCircle">Breathe ♡</div>
+    </div>
+    <div style="text-align:center">
+      <p id="breathText" class="muted">Ready when you are.</p>
+      <button class="btn" id="breathButton" onclick="startBreathing()">Start breathing</button>
+      <button class="btn white" onclick="stopBreathing()">Stop</button>
+    </div>
+  </div>
+  <div class="card">
+    <h2>5–4–3–2–1 Grounding 🌷</h2>
+    <p class="sub">Gently bring your attention back to the present moment.</p>
+    <div class="ground">👀 **5 things** you can see.</div>
+    <div class="ground">🤲 **4 things** you can feel.</div>
+    <div class="ground">👂 **3 things** you can hear.</div>
+    <div class="ground">👃 **2 things** you can smell.</div>
+    <div class="ground">👅 **1 thing** you can taste.</div>
+  </div>
+</section>
+
+<!-- HISTORY -->
+<section class="page" id="history">
+  <h1>Chat History ☁</h1>
+  <p class="sub">Your saved AI Buddy conversations.</p>
+  <div class="card">
+    <div id="historyList"><div class="empty">Your saved conversations will appear here.</div></div>
+  </div>
+</section>
+
+<!-- SETTINGS -->
+<section class="page" id="settings">
+  <h1>Settings ⚙</h1>
+  <p class="sub">Manage your little space.</p>
+  <div class="card">
+    <h2>Your profile</h2>
+    <label class="field-label">Your anonymous nickname</label>
+    <input id="nicknameInput" maxlength="30" placeholder="Unspoken Soul">
+    <button class="btn" style="margin-top:12px" onclick="saveNickname()">Save nickname</button>
+    <p class="muted" id="profileStatus"></p>
+  </div>
+  <div class="card">
+    <h2>Your account</h2>
+    <p class="muted" id="accountEmail"></p>
+    <button class="btn danger" onclick="logout()">Log out</button>
+  </div>
+</section>
+
+</main>
+</div>
+
+<!-- LETTER MODAL -->
+<div class="modal-bg" id="letterModal" onclick="if(event.target===this)closeLetter()">
+  <div class="modal">
+    <div id="letterModalContent"></div>
+    <div class="modal-actions">
+      <button class="btn white" onclick="closeLetter()">Close letter</button>
+    </div>
+  </div>
+</div>
+
+<!-- GENERAL MODAL -->
+<div class="modal-bg" id="generalModal" onclick="if(event.target===this)closeGeneralModal()">
+  <div class="modal">
+    <div id="generalModalContent"></div>
+    <div class="modal-actions">
+      <button class="btn white" onclick="closeGeneralModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ==========================================
+   SUPABASE CONFIGURATION
+   Replace these two values with your own.
+========================================== */
+
+const SUPABASE_URL = "https://ilsdwbsqkamzeupazazf.supabase.co";
+const SUPABASE_KEY = "sb_publishable_RWH6y7iQcNvbkzyJ-FUSSw_iwJsIqWA";
+
+let db = null;
+let currentUser = null;
+let currentMood = "🌷";
+let authMode = "login";
+let currentLetter = null;
+let chatSessionId = null;
+let saveCurrentChat = false;
+let currentChatMessages = [];
+let breathingTimer = null;
+let breathingStopped = false;
+
+/* ==========================================
+   INITIALISE
+========================================== */
+
+document.getElementById("today").textContent =
+  new Date().toLocaleDateString(undefined,{
+    weekday:"long",year:"numeric",month:"long",day:"numeric"
+  });
+
+function setStatus(id,message){
+  const el=document.getElementById(id);
+  if(el)el.textContent=message;
+}
+
+function escapeHTML(value){
+  return String(value ?? "").replace(/[&<>"']/g,char=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  })[char]);
+}
+
+function formatDate(value){
+  return new Date(value).toLocaleString(undefined,{
+    dateStyle:"medium",timeStyle:"short"
+  });
+}
+
+function requireDB(){
+  if(!db)throw new Error("Please add your Supabase project URL and publishable key first.");
+  if(!currentUser)throw new Error("Please log in first.");
+}
+
+function initialiseSupabase(){
+  if(!SUPABASE_URL.startsWith("https://") ||
+     SUPABASE_KEY.includes("YOUR_SUPABASE")){
+    setStatus("authStatus","Please add your Supabase URL and publishable key in the code first.");
+    return;
+  }
+
+  db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+
+  db.auth.onAuthStateChange((event,session)=>{
+    setTimeout(()=>{
+      currentUser=session?.user||null;
+      if(currentUser){
+        showApp();
+        loadInitialData();
+      }else{
+        showAuth();
+      }
+    },0);
+  });
+
+  db.auth.getSession().then(({data,error})=>{
+    if(error){
+      setStatus("authStatus",error.message);
+      return;
+    }
+    currentUser=data.session?.user||null;
+    if(currentUser){
+      showApp();
+      loadInitialData();
+    }else{
+      showAuth();
+    }
+  });
+}
+
+function showAuth(){
+  document.getElementById("authScreen").style.display="grid";
+  document.getElementById("app").style.display="none";
+}
+
+function showApp(){
+  document.getElementById("authScreen").style.display="none";
+  document.getElementById("app").style.display="block";
+  document.getElementById("accountEmail").textContent=currentUser?.email||"";
+  document.getElementById("userPill").textContent="Unspoken Soul ♡";
+}
+
+async function loadInitialData(){
+  await ensureProfile();
+  await Promise.allSettled([
+    loadDiary(),loadLetters(),loadMyLetters(),loadHistory()
+  ]);
+}
+
+/* ==========================================
+   EMAIL AUTHENTICATION
+========================================== */
+
+function toggleAuthMode(){
+  authMode=authMode==="login"?"signup":"login";
+
+  document.getElementById("authTitle").textContent=
+    authMode==="login"?"Welcome to your safe space":"Create your little space";
+
+  document.getElementById("authDescription").textContent=
+    authMode==="login"
+    ?"A place to write, breathe, share and feel understood."
+    :"Begin your journey in a space made for your feelings.";
+
+  document.getElementById("authSubmitButton").textContent=
+    authMode==="login"?"✧ Login":"♡ Create Account";
+
+  document.getElementById("authSwitchText").textContent=
+    authMode==="login"?"Don't have an account?":"Already have an account?";
+
+  document.getElementById("authSwitchButton").textContent=
+    authMode==="login"?"Sign up":"Login";
+
+  document.getElementById("authPassword").value="";
+  setStatus("authStatus","");
+}
+
+async function handleEmailAuth(){
+  if(!db){
+    setStatus("authStatus","Please configure Supabase URL and key first.");
+    return;
+  }
+
+  const email=document.getElementById("authEmail").value.trim();
+  const password=document.getElementById("authPassword").value;
+  const button=document.getElementById("authSubmitButton");
+
+  if(!email||!password){
+    setStatus("authStatus","Please enter your email and password.");
+    return;
+  }
+
+  if(password.length<6){
+    setStatus("authStatus","Password must be at least 6 characters.");
+    return;
+  }
+
+  button.disabled=true;
+  setStatus("authStatus","Please wait...");
+
+  try{
+    if(authMode==="signup"){
+      const {data,error}=await db.auth.signUp({email,password});
+      if(error)throw error;
+
+      if(data.session){
+        setStatus("authStatus","Account created! Welcome to Dear, Unspoken ♡");
+      }else{
+        setStatus("authStatus","Account created! Please check your email to confirm your account before logging in.");
+      }
+    }else{
+      const {error}=await db.auth.signInWithPassword({email,password});
+      if(error)throw error;
+      setStatus("authStatus","Welcome back ♡");
+    }
+  }catch(error){
+    setStatus("authStatus",error.message||"Something went wrong.");
+  }finally{
+    button.disabled=false;
+  }
+}
+
+async function logout(){
+  if(!db)return;
+  const {error}=await db.auth.signOut();
+  if(error)alert(error.message);
+}
+
+/* ==========================================
+   PROFILE
+========================================== */
+
+async function ensureProfile(){
+  if(!currentUser)return;
+
+  const {data,error}=await db.from("profiles")
+    .select("*").eq("id",currentUser.id).maybeSingle();
+
+  if(error){
+    console.error("Profile error:",error);
+    return;
+  }
+
+  if(!data){
+    const nickname="Unspoken Soul";
+    const {error:insertError}=await db.from("profiles").insert({
+      id:currentUser.id,nickname
+    });
+    if(insertError)console.error(insertError);
+    document.getElementById("nicknameInput").value=nickname;
+    return;
+  }
+
+  document.getElementById("nicknameInput").value=data.nickname||"Unspoken Soul";
+  document.getElementById("userPill").textContent=(data.nickname||"Unspoken Soul")+" ♡";
+}
+
+async function saveNickname(){
+  try{
+    requireDB();
+    const nickname=document.getElementById("nicknameInput").value.trim();
+    if(!nickname)throw new Error("Please enter a nickname.");
+
+    const {error}=await db.from("profiles").upsert({
+      id:currentUser.id,nickname
+    });
+    if(error)throw error;
+
+    document.getElementById("userPill").textContent=nickname+" ♡";
+    setStatus("profileStatus","Your nickname has been saved ♡");
+  }catch(error){
+    setStatus("profileStatus",error.message);
+  }
+}
+
+/* ==========================================
+   NAVIGATION
+========================================== */
+
+function go(page,button){
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  const target=document.getElementById(page);
+  if(target)target.classList.add("active");
+
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  if(button)button.classList.add("active");
+  else{
+    const nav=[...document.querySelectorAll(".nav-btn")];
+    const match=nav.find(b=>b.getAttribute("onclick")?.includes("'"+page+"'"));
+    if(match)match.classList.add("active");
+  }
+
+  if(page==="community")loadLetters();
+  if(page==="myletters")loadMyLetters();
+  if(page==="history")loadHistory();
+}
+
+/* ==========================================
+   PRIVATE DIARY
+========================================== */
+
+function selectMood(button){
+  document.querySelectorAll(".mood").forEach(b=>b.classList.remove("selected"));
+  button.classList.add("selected");
+  currentMood=button.dataset.mood;
+}
+
+async function saveDiary(){
+  try{
+    requireDB();
+    const body=document.getElementById("diaryBody").value.trim();
+    if(!body)throw new Error("Write something in your diary first.");
+
+    const {error}=await db.from("diary_entries").insert({
+      user_id:currentUser.id,
+      body:currentMood+" "+body
+    });
+    if(error)throw error;
+
+    document.getElementById("diaryBody").value="";
+    setStatus("diaryStatus","Your thoughts have been saved privately ♡");
+    await loadDiary();
+  }catch(error){
+    setStatus("diaryStatus",error.message);
+  }
+}
+
+async function loadDiary(){
+  if(!currentUser)return;
+  const container=document.getElementById("diaryList");
+
+  const {data,error}=await db.from("diary_entries")
+    .select("*").eq("user_id",currentUser.id)
+    .order("created_at",{ascending:false});
+
+  if(error){
+    container.innerHTML='<div class="empty">Could not load diary entries: '+escapeHTML(error.message)+'</div>';
+    return;
+  }
+
+  if(!data?.length){
+    container.innerHTML='<div class="empty">Your diary is waiting for your first little entry ♡</div>';
+    return;
+  }
+
+  container.innerHTML=data.map(entry=>`
+    <div class="entry">
+      <div class="entry-meta">${escapeHTML(formatDate(entry.created_at))}</div>
+      <div class="entry-body">${escapeHTML(entry.body)}</div>
+      <button class="btn danger small" onclick="deleteDiary('${entry.id}')">Delete</button>
+    </div>
+  `).join("");
+}
+
+async function deleteDiary(id){
+  if(!confirm("Delete this diary entry?"))return;
+  const {error}=await db.from("diary_entries")
+    .delete().eq("id",id).eq("user_id",currentUser.id);
+  if(error)alert(error.message);
+  else loadDiary();
+}
+
+/* ==========================================
+   COMMUNITY LETTERS
+========================================== */
+
+async function publishLetter(){
+  try{
+    requireDB();
+    const title=document.getElementById("letterTitle").value.trim();
+    const body=document.getElementById("letterBody").value.trim();
+
+    if(!title||!body)throw new Error("Please add a title and write your letter.");
+
+    const {error}=await db.from("letters").insert({
+      user_id:currentUser.id,title,body
+    });
+    if(error)throw error;
+
+    document.getElementById("letterTitle").value="";
+    document.getElementById("letterBody").value="";
+    setStatus("letterStatus","Your letter has been sealed and shared anonymously ♡");
+    await loadLetters();
+    await loadMyLetters();
+  }catch(error){
+    setStatus("letterStatus",error.message);
+  }
+}
+
+async function loadLetters(){
+  if(!currentUser)return;
+  const container=document.getElementById("letterGrid");
+
+  const {data,error}=await db.from("letters")
+    .select("id,user_id,title,body,created_at")
+    .order("created_at",{ascending:false});
+
+  if(error){
+    container.innerHTML='<div class="empty">Could not load letters: '+escapeHTML(error.message)+'</div>';
+    return;
+  }
+
+  if(!data?.length){
+    container.innerHTML='<div class="empty">No letters yet. Maybe yours will be the first? ♡</div>';
+    return;
+  }
+
+  container.innerHTML=data.map(letter=>`
+    <div class="envelope" onclick="openLetter('${letter.id}')">
+      <div class="envelope-flower">✿</div>
+      <div class="envelope-title">${escapeHTML(letter.title)}</div>
+      <div class="envelope-bottom">AN ANONYMOUS LETTER · ${escapeHTML(new Date(letter.created_at).toLocaleDateString())}</div>
+      <div class="envelope-seal">♡</div>
+    </div>
+  `).join("");
+}
+
+async function openLetter(id){
+  const {data:letter,error}=await db.from("letters")
+    .select("*").eq("id",id).single();
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  currentLetter=letter;
+  const isOwner=letter.user_id===currentUser.id;
+
+  let replyArea="";
+  if(!isOwner){
+    replyArea=`
+      <div class="private-reply-card">
+        <h3>Send a private reply ♡</h3>
+        <p class="muted">Only you and the letter author can read this reply.</p>
+        <textarea id="privateReplyBody" placeholder="Dear writer, I just want you to know..."></textarea>
+        <button class="btn" style="margin-top:10px" onclick="sendPrivateReply()">Send privately ♡</button>
+        <p class="muted" id="replyStatus"></p>
+      </div>`;
+  }else{
+    replyArea=`
+      <div class="notice" style="margin-top:18px">
+        This is your letter. Private replies from readers will appear in My Letters & Replies.
+      </div>`;
+  }
+
+  document.getElementById("letterModalContent").innerHTML=`
+    <div class="letter-modal-paper">
+      <div class="paper-top">☾ A LETTER FROM THE HEART ☾</div>
+      <div class="paper-title">${escapeHTML(letter.title)}</div>
+      <div class="paper-body">${escapeHTML(letter.body)}</div>
+      <div class="paper-sign">With love, an unspoken soul ♡</div>
+    </div>
+    <p class="muted" style="text-align:center;margin:15px 0">
+      ${escapeHTML(formatDate(letter.created_at))}
+    </p>
+    ${replyArea}
+  `;
+
+  document.getElementById("letterModal").classList.add("show");
+}
+
+function closeLetter(){
+  document.getElementById("letterModal").classList.remove("show");
+  currentLetter=null;
+}
+
+async function sendPrivateReply(){
+  try{
+    if(!currentLetter)throw new Error("Letter not found.");
+    const body=document.getElementById("privateReplyBody").value.trim();
+    if(!body)throw new Error("Please write your reply first.");
+
+    const {error}=await db.from("letter_replies").insert({
+      letter_id:currentLetter.id,
+      sender_id:currentUser.id,
+      recipient_id:currentLetter.user_id,
+      body
+    });
+
+    if(error)throw error;
+
+    document.getElementById("privateReplyBody").value="";
+    setStatus("replyStatus","Your private reply has been sent ♡");
+  }catch(error){
+    setStatus("replyStatus",error.message);
+  }
+}
+
+/* ==========================================
+   MY LETTERS AND PRIVATE REPLIES
+========================================== */
+
+async function loadMyLetters(){
+  if(!currentUser)return;
+
+  const mine=document.getElementById("myLettersList");
+  const received=document.getElementById("receivedReplies");
+  const sent=document.getElementById("sentReplies");
+
+  const {data:letters,error:letterError}=await db.from("letters")
+    .select("*").eq("user_id",currentUser.id)
+    .order("created_at",{ascending:false});
+
+  if(letterError){
+    mine.innerHTML='<div class="empty">'+escapeHTML(letterError.message)+'</div>';
+  }else if(!letters?.length){
+    mine.innerHTML='<div class="empty">You have not written any letters yet.</div>';
+  }else{
+    mine.innerHTML=letters.map(l=>`
+      <div class="entry">
+        <strong>${escapeHTML(l.title)}</strong>
+        <p class="muted">${escapeHTML(formatDate(l.created_at))}</p>
+        <button class="btn white small" onclick="openLetter('${l.id}')">Open my letter</button>
+        <button class="btn danger small" onclick="deleteLetter('${l.id}')">Delete</button>
+      </div>
+    `).join("");
+  }
+
+  const {data:incoming,error:incomingError}=await db.from("letter_replies")
+    .select("id,letter_id,sender_id,recipient_id,body,created_at,letters(title)")
+    .eq("recipient_id",currentUser.id)
+    .order("created_at",{ascending:false});
+
+  if(incomingError){
+    received.innerHTML='<div class="empty">'+escapeHTML(incomingError.message)+'</div>';
+  }else if(!incoming?.length){
+    received.innerHTML='<div class="empty">No private replies yet. ♡</div>';
+  }else{
+    received.innerHTML=incoming.map(r=>`
+      <div class="reply-item">
+        <div class="entry-meta">Reply to: ${escapeHTML(r.letters?.title||"Your letter")} · ${escapeHTML(formatDate(r.created_at))}</div>
+        <div class="reply-body">${escapeHTML(r.body)}</div>
+        <div class="muted">Private conversation · Only you and the sender can read this.</div>
+        <button class="btn danger small" onclick="deleteReply('${r.id}')">Delete reply</button>
+      </div>
+    `).join("");
+  }
+
+  const {data:outgoing,error:outgoingError}=await db.from("letter_replies")
+    .select("id,letter_id,sender_id,recipient_id,body,created_at,letters(title)")
+    .eq("sender_id",currentUser.id)
+    .order("created_at",{ascending:false});
+
+  if(outgoingError){
+    sent.innerHTML='<div class="empty">'+escapeHTML(outgoingError.message)+'</div>';
+  }else if(!outgoing?.length){
+    sent.innerHTML='<div class="empty">You have not sent any private replies yet.</div>';
+  }else{
+    sent.innerHTML=outgoing.map(r=>`
+      <div class="reply-item">
+        <div class="entry-meta">Your reply to: ${escapeHTML(r.letters?.title||"A letter")} · ${escapeHTML(formatDate(r.created_at))}</div>
+        <div class="reply-body">${escapeHTML(r.body)}</div>
+        <button class="btn danger small" onclick="deleteReply('${r.id}')">Delete reply</button>
+      </div>
+    `).join("");
+  }
+}
+
+async function deleteLetter(id){
+  if(!confirm("Delete this letter? Its replies will also be deleted."))return;
+  const {error}=await db.from("letters").delete()
+    .eq("id",id).eq("user_id",currentUser.id);
+  if(error)alert(error.message);
+  else{
+    loadMyLetters();
+    loadLetters();
+  }
+}
+
+async function deleteReply(id){
+  if(!confirm("Delete this private reply?"))return;
+  const {error}=await db.from("letter_replies").delete().eq("id",id);
+  if(error)alert(error.message);
+  else loadMyLetters();
+}
+
+/* ==========================================
+   AI BUDDY
+========================================== */
+
+function chooseBuddy(type){
+  document.getElementById("buddyChoices").classList.add("hidden");
+
+  if(type==="ai"){
+    document.getElementById("aiConsent").classList.remove("hidden");
+  }else{
+    document.getElementById("humanInfo").classList.remove("hidden");
+  }
+}
+
+function backBuddy(){
+  document.getElementById("aiConsent").classList.add("hidden");
+  document.getElementById("humanInfo").classList.add("hidden");
+  document.getElementById("chatPanel").classList.add("hidden");
+  document.getElementById("buddyChoices").classList.remove("hidden");
+}
+
+async function startAIChat(){
+  const choice=document.querySelector('input[name="saveChat"]:checked')?.value;
+  saveCurrentChat=choice==="yes";
+  currentChatMessages=[];
+  chatSessionId=null;
+
+  if(saveCurrentChat){
+    try{
+      const {data,error}=await db.from("chat_sessions").insert({
+        user_id:currentUser.id,
+        buddy_type:"ai",
+        title:"AI Buddy conversation"
+      }).select().single();
+
+      if(error)throw error;
+      chatSessionId=data.id;
+    }catch(error){
+      alert("Could not create saved chat: "+error.message);
+      return;
+    }
+  }
+
+  document.getElementById("aiConsent").classList.add("hidden");
+  document.getElementById("chatPanel").classList.remove("hidden");
+  document.getElementById("chatTitle").textContent="AI Buddy ☁";
+  document.getElementById("chatSaveLabel").textContent=
+    saveCurrentChat?"This conversation is saved in your history.":"This conversation will not be saved in your app history.";
+
+  document.getElementById("chatBody").innerHTML="";
+  addBubble("buddy","Hello, little soul. ♡ I'm here with you. You can tell me anything that's on your mind. No pressure, no judgement.");
+}
+
+function getBuddyReply(message){
+  const m=message.toLowerCase();
+
+  if(/suicid|kill myself|end my life|hurt myself|self harm/.test(m)){
+    return "I'm really sorry things feel this painful. You deserve immediate support from a real person, not to face this alone. If you might act on these thoughts or are in immediate danger, please contact emergency services or go to the nearest emergency department. In Malaysia, you can call 999. Can you reach someone you trust and stay with them right now?";
+  }
+  if(/sad|cry|lonely|alone|depress|down/.test(m)){
+    return "That sounds really heavy to carry. You don't have to pretend you're okay here. Would you like to tell me what happened, or would it help more if I simply stayed with you for a moment? ♡";
+  }
+  if(/angry|mad|hate|frustrat/.test(m)){
+    return "It sounds like something has really upset you. Your feelings deserve space too. Let's take one slow breath first. What happened that made you feel this way?";
+  }
+  if(/anxious|anxiety|panic|scared|worry|afraid/.test(m)){
+    return "Let's slow things down together. Feel your feet against the floor and take one gentle breath. You don't need to solve everything at once. What is the biggest thing worrying you right now?";
+  }
+  if(/tired|exhaust|burnout|sleep/.test(m)){
+    return "It sounds like you've been carrying a lot. Rest is not something you need to earn. Is there one small thing you can put down for tonight?";
+  }
+  if(/thank/.test(m)){
+    return "You're welcome, little soul. ♡ I'm glad you shared a little of your world with me.";
+  }
+  return "Thank you for trusting this space with your thoughts. ♡ I may not have all the answers, but your feelings matter. Can you tell me a little more about that?";
+}
+
+function addBubble(sender,text){
+  const body=document.getElementById("chatBody");
+  const div=document.createElement("div");
+  div.className="bubble "+(sender==="me"?"me":"");
+  div.textContent=text;
+  body.appendChild(div);
+  body.scrollTop=body.scrollHeight;
+}
+
+async function sendChat(){
+  const input=document.getElementById("chatInput");
+  const message=input.value.trim();
+  if(!message)return;
+
+  input.value="";
+  addBubble("me",message);
+  currentChatMessages.push({sender:"me",body:message});
+
+  if(saveCurrentChat&&chatSessionId){
+    const {error}=await db.from("chat_messages").insert({
+      session_id:chatSessionId,
+      user_id:currentUser.id,
+      sender:"me",
+      body:message
+    });
+    if(error)console.error("Message save error:",error);
+  }
+
+  const reply=getBuddyReply(message);
+  setTimeout(async()=>{
+    addBubble("buddy",reply);
+    currentChatMessages.push({sender:"buddy",body:reply});
+
+    if(saveCurrentChat&&chatSessionId){
+      const {error}=await db.from("chat_messages").insert({
+        session_id:chatSessionId,
+        user_id:currentUser.id,
+        sender:"buddy",
+        body:reply
+      });
+      if(error)console.error("Reply save error:",error);
+    }
+  },650);
+}
+
+function endChat(){
+  document.getElementById("chatPanel").classList.add("hidden");
+  document.getElementById("buddyChoices").classList.remove("hidden");
+  loadHistory();
+}
+
+/* ==========================================
+   CHAT HISTORY
+========================================== */
+
+async function loadHistory(){
+  if(!currentUser)return;
+  const container=document.getElementById("historyList");
+
+  const {data,error}=await db.from("chat_sessions")
+    .select("*").eq("user_id",currentUser.id)
+    .order("created_at",{ascending:false});
+
+  if(error){
+    container.innerHTML='<div class="empty">'+escapeHTML(error.message)+'</div>';
+    return;
+  }
+
+  if(!data?.length){
+    container.innerHTML='<div class="empty">No saved conversations yet. ♡</div>';
+    return;
+  }
+
+  container.innerHTML=data.map(session=>`
+    <div class="entry">
+      <strong>${escapeHTML(session.title)}</strong>
+      <div class="entry-meta">${escapeHTML(formatDate(session.created_at))}</div>
+      <div style="margin-top:12px">
+        <button class="btn white small" onclick="viewHistory('${session.id}')">View conversation</button>
+        <button class="btn danger small" onclick="deleteHistory('${session.id}')">Delete</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+async function viewHistory(id){
+  const {data:session,error:sessionError}=await db.from("chat_sessions")
+    .select("*").eq("id",id).single();
+
+  if(sessionError){alert(sessionError.message);return;}
+
+  const {data:messages,error}=await db.from("chat_messages")
+    .select("*").eq("session_id",id)
+    .order("created_at",{ascending:true});
+
+  if(error){alert(error.message);return;}
+
+  document.getElementById("generalModalContent").innerHTML=`
+    <h2>${escapeHTML(session.title)}</h2>
+    <div class="muted">${escapeHTML(formatDate(session.created_at))}</div>
+    <div style="margin-top:18px">
+      ${(messages||[]).map(m=>`
+        <div class="bubble ${m.sender==="me"?"me":""}">${escapeHTML(m.body)}</div>
+      `).join("")||'<p class="empty">No messages in this conversation.</p>'}
+    </div>
+  `;
+  document.getElementById("generalModal").classList.add("show");
+}
+
+async function deleteHistory(id){
+  if(!confirm("Delete this saved conversation and its messages?"))return;
+  const {error}=await db.from("chat_sessions").delete()
+    .eq("id",id).eq("user_id",currentUser.id);
+  if(error)alert(error.message);
+  else loadHistory();
+}
+
+function closeGeneralModal(){
+  document.getElementById("generalModal").classList.remove("show");
+}
+
+/* ==========================================
+   CALM DOWN BREATHING
+========================================== */
+
+async function startBreathing(){
+  stopBreathing();
+  breathingStopped=false;
+
+  const circle=document.getElementById("breathCircle");
+  const text=document.getElementById("breathText");
+  const button=document.getElementById("breathButton");
+  button.disabled=true;
+
+  const phases=[
+    {name:"Breathe in...",duration:4000,className:"in"},
+    {name:"Hold gently...",duration:4000,className:"hold"},
+    {name:"Breathe out...",duration:6000,className:"out"}
+  ];
+
+  while(!breathingStopped){
+    for(const phase of phases){
+      if(breathingStopped)break;
+      circle.className="breath "+phase.className;
+      circle.textContent=phase.name;
+      text.textContent=phase.name+" Take your time ♡";
+
+      await new Promise(resolve=>{
+        breathingTimer=setTimeout(resolve,phase.duration);
+      });
+    }
+  }
+  button.disabled=false;
+}
+
+function stopBreathing(){
+  breathingStopped=true;
+  clearTimeout(breathingTimer);
+  const circle=document.getElementById("breathCircle");
+  if(circle){
+    circle.className="breath";
+    circle.textContent="Breathe ♡";
+  }
+  const text=document.getElementById("breathText");
+  if(text)text.textContent="Ready when you are.";
+  const button=document.getElementById("breathButton");
+  if(button)button.disabled=false;
+}
+
+/* ==========================================
+   START
+========================================== */
+
+initialiseSupabase();
+</script>
+</body>
+</html>
